@@ -9,5 +9,13 @@ Using GLFW instead of SDL, to be easier to follow learnopengl.com tutorial/book
 
 ### Building GLFW
 
-- Download GLFW
-- 
+- Download GLFW (google glfw donwload, but linux usually already have installed)
+
+### Compiling 
+
+Use this headers:
+
+`-lglfw3 -lGL -lX11 -lpthread -lXrandr -lXi -ldl.`
+
+Links (in order): glfw, opengl, x11, thread, xrandr (resize and rotate), xi (input), and dl (dynamic loader)
+
