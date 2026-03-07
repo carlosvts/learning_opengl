@@ -9,6 +9,8 @@ constexpr int HEIGHT = 600;
 
 // resize viewport when window is resized
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+// process input
+void process_input(GLFWwindow* window);
 
 int main()
 {
@@ -49,6 +51,14 @@ int main()
     
     while (!glfwWindowShouldClose(window))
     {
+        // input
+        process_input(window);
+        
+        // rendering
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT); // fill the buffer with color configured by glClearColor
+
+        // displaying (swap buffers)
         glfwSwapBuffers(window); // swap color 2d buffer (basically screen)
         glfwPollEvents();        // check for input events
     }
@@ -63,3 +73,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
+void process_input(GLFWwindow* window)
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+}
