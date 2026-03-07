@@ -38,3 +38,21 @@ Unzip them into the working directory
 After that, we can `include <glad/glad.h>` into our code
 
 > Hint: if we add glad.h inside our local include, we should also compile with the tag `Include` 
+
+## Graphics Pipeline
+
+What is the graphics pipeline?
+
+Everything in OpenGL works on 3D space, but screen is 2D, so the pipeline is:
+
+3D coordinates --> 2D coordinates --> colored pixels
+
+- `shaders:` small process that runs on GPU cores for each step of the pipeline
+
+`Vertex Data:` list of three 3D coordinates that maps to a triangle. Each vertex data contain a `vertex atributte`, that can be whatever we want (eg a particle), but it can be just a 3D position and a color
+
+Our collection of coordinates needs to be known for OpenGL, so we need to pass a hint for its `primitive` type: `GL_POINTS`, `GL_TRIANGLES`, `GL_LINE_STRIP`
+
+In modern OpenGL we are required to make a `vertex` and a `fragment shader` (check book)
+
+
