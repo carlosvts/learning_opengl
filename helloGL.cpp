@@ -33,8 +33,8 @@ int main()
     // ------------------
     // glad setup
     // ------------------
-
-    if (!gladLoadGLLoader(GLADloadproc(glfwGetProcAddress)))
+    
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
@@ -45,7 +45,16 @@ int main()
     glViewport(0, 0, WIDTH, HEIGHT);
 
     // tells glfw to call our function when window is resized
-    glfwSetFramebufferSizeCallback(window,framebuffer_size_callback);    
+    glfwSetFramebufferSizeCallback(window,framebuffer_size_callback);
+    
+    while (!glfwWindowShouldClose(window))
+    {
+        glfwSwapBuffers(window); // swap color 2d buffer (basically screen)
+        glfwPollEvents();        // check for input events
+    }
+
+    glfwTerminate();
+    return 0;
 }
 
 // resize viewport when window is resized
