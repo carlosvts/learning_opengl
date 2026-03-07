@@ -55,4 +55,7 @@ Our collection of coordinates needs to be known for OpenGL, so we need to pass a
 
 In modern OpenGL we are required to make a `vertex` and a `fragment shader` (check book)
 
+### Vertex Shader 
+
+Vertex shader is written in GLSL (OpenGL Shader Language)
 

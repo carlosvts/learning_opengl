@@ -11,6 +11,23 @@ constexpr int HEIGHT = 600;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 // process input
 void process_input(GLFWwindow* window);
+// triangle
+void draw_triangle();
+
+// compiling
+const char* vertexShaderSource = "#version 330 core\n"
+    "layout (location = 0) in vec3 aPos;\n"
+    "void main()\n"
+    "{\n"
+    " gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    "}\0";
+
+const char* fragmentShaderSource = "#version 330 core\n"
+    "out vec4 FragColor\n"
+    "void main()\n"
+    "{\n"
+    " FragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);\n"
+    "}\0"
 
 int main()
 {
@@ -41,14 +58,14 @@ int main()
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
-
+    
     // set viewport for opengl
     // first two parameters are location
     glViewport(0, 0, WIDTH, HEIGHT);
-
+    
     // tells glfw to call our function when window is resized
     glfwSetFramebufferSizeCallback(window,framebuffer_size_callback);
-    
+
     while (!glfwWindowShouldClose(window))
     {
         // input
@@ -77,4 +94,86 @@ void process_input(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+}
+
+void draw_triangle()
+{
+    float vertices[] = 
+    {
+        // x   y  z=0 (cause we rendering on 2d)
+        -0.5f, -0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
+        0.0f, 0.5f, 0.0f,
+    };
+
+    // buffer for our vertex data that will be sent to GPU
+    // VBO vertex buffer object
+    // unsignedt int, ie, large buffer ie we can add many vertex
+    // VBO is a OpenGL object
+    unsigned int VBO;
+    // generate a unique ID for VBO
+    glad_glGenBuffers(1, &VBO);
+    // binds a buffer type to our buffer
+    glad_glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+    // copy previously defined vertex data into buffers memory
+    // • GL_STREAM_DRAW: the data is set only once and used by the GPU at most a few times.
+    // • GL_STATIC_DRAW: the data is set only once and used many times.
+    // • GL_DYNAMIC_DRAW: the data is changed a lot and used many times.
+    glad_glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // compiling vertex shader
+    unsigned int vertex_shader;
+    vertex_shader = glad_glCreateShader(GL_VERTEX_SHADER);
+    glad_glShaderSource(vertex_shader, 1, &vertexShaderSource, NULL);
+    glad_glCompileShader(vertex_shader);
+
+    // checks if compile shaders worked
+    int success;
+    char infoLog[512];
+    glad_glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        glGetShaderInfoLog(vertex_shader, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
+
+    // Fragment Shader - calculating colors (RGBA)
+    unsigned int fragment_shader;
+    fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragment_shader, 1, &fragment_shader, NULL);
+    glCompileShader(fragment_shader);
+
+    // Shader Program - creating a shader object (linking vertex and fragment)
+    unsigned int shader_program;
+    shader_program = glCreateProgram(); // returns an id
+    // linking
+    glAttachShader(shader_program, vertex_shader);
+    glAttachShader(shader_program, fragment_shader);
+    glLinkProgram(shader_program);
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    
+    if (!success) 
+    {
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        std::cout << "error linking shader\n" << infoLog << std::endl;
+    }
+
+    // set opengl to use shader program
+    glUseProgram(shader_program);
+
+    // linking vertex attribute
+    // 0 defined in layout = 0
+    // 3 size of vertex attribute (a vec3)
+    // type of data of vec3
+    // normalize: GL_FALSE
+    // stride, space between  consecutive vertex elements
+    // (offset in bytes)
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+
+    
+    glDeleteShader(vertex_shader);
+    glDeleteShader(fragment_shader);
 }
