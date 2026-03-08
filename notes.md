@@ -59,3 +59,16 @@ In modern OpenGL we are required to make a `vertex` and a `fragment shader` (che
 
 Vertex shader is written in GLSL (OpenGL Shader Language)
 
+More info in book
+
+### EBO (Element Buffer Object)
+
+We can create a EBO when we have figures that reuses points, eg a rectangle is made by two triangles, but we actually need just 4 points and not 6
+
+### GLSL
+
+GL Shaders Language is pretty similar as C, just some tricks
+
+they have vectors and matrices
+
+also `uniforms`, aka global variables
