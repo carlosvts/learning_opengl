@@ -13,6 +13,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void process_input(GLFWwindow* window);
 // triangle
 void draw_triangle(unsigned int shader_program);
+// rectangle
+void draw_rect(unsigned int shader_program);
 
 // compiling
 const char* vertexShaderSource = "#version 330 core\n"
@@ -78,6 +80,11 @@ int main()
         -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
         0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
         0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
+
+        // other triangle
+        0.5, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+        -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+        -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
     };
     
     // creating Vertex Array Object - VAO
@@ -161,7 +168,8 @@ int main()
         // rendering
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT); // fill the buffer with color configured by glClearColor
-        draw_triangle(shader_program);
+        // draw_triangle(shader_program);
+        draw_rect(shader_program);
         
         // displaying (swap buffers)
         glfwSwapBuffers(window); // swap color 2d buffer (basically screen)
@@ -193,4 +201,11 @@ void draw_triangle(unsigned int shader_program)
     
     // draw triangle
     glDrawArrays(GL_TRIANGLES, 0, 3);
+}
+
+void draw_rect(unsigned int shader_program)
+{
+    glUseProgram(shader_program);
+
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
