@@ -17,17 +17,22 @@ void draw_triangle(unsigned int shader_program);
 // compiling
 const char* vertexShaderSource = "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
+    "layout (location = 1) in vec3 aColor;\n"
+    "out vec3 vertexColor;"
     "void main()\n"
     "{\n"
     " gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    " vertexColor = aColor;"
     "}\0";
 
 const char* fragmentShaderSource = "#version 330 core\n"
+    "in vec3 vertexColor;\n"
     "out vec4 FragColor;\n"
     "void main()\n"
     "{\n"
-    " FragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);\n"
+    " FragColor = vec4(vertexColor, 1.0);\n"
     "}\0";
+
 
 int main()
 {
@@ -68,10 +73,11 @@ int main()
 
     float vertices[] = 
     {
-        // x   y  z=0 (cause we rendering on 2d)
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f, 0.5f, 0.0f,
+        // x   y  
+        // z=0 (cause we rendering on 2d)        colors
+        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
     };
     
     // creating Vertex Array Object - VAO
@@ -133,15 +139,19 @@ int main()
     }
 
     
-    // linking vertex attribute
+    // linking vertex attribute position
     // 0 defined in layout = 0
     // 3 size of vertex attribute (a vec3)
     // type of data of vec3
     // normalize: GL_FALSE
     // stride, space between  consecutive vertex elements
     // (offset in bytes)
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+
+    // linking vertex attribute color          6 cause skipping position
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3*sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     while (!glfwWindowShouldClose(window))
     {
