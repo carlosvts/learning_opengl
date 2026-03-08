@@ -12,7 +12,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 // process input
 void process_input(GLFWwindow* window);
 // triangle
-void draw_triangle();
+void draw_triangle(unsigned int shader_program);
 
 // compiling
 const char* vertexShaderSource = "#version 330 core\n"
@@ -23,11 +23,11 @@ const char* vertexShaderSource = "#version 330 core\n"
     "}\0";
 
 const char* fragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor\n"
+    "out vec4 FragColor;\n"
     "void main()\n"
     "{\n"
     " FragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);\n"
-    "}\0"
+    "}\0";
 
 int main()
 {
@@ -66,38 +66,6 @@ int main()
     // tells glfw to call our function when window is resized
     glfwSetFramebufferSizeCallback(window,framebuffer_size_callback);
 
-    while (!glfwWindowShouldClose(window))
-    {
-        // input
-        process_input(window);
-        
-        // rendering
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT); // fill the buffer with color configured by glClearColor
-
-        // displaying (swap buffers)
-        glfwSwapBuffers(window); // swap color 2d buffer (basically screen)
-        glfwPollEvents();        // check for input events
-    }
-
-    glfwTerminate();
-    return 0;
-}
-
-// resize viewport when window is resized
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    glViewport(0, 0, width, height);
-}
-
-void process_input(GLFWwindow* window)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-}
-
-void draw_triangle()
-{
     float vertices[] = 
     {
         // x   y  z=0 (cause we rendering on 2d)
@@ -105,6 +73,11 @@ void draw_triangle()
         0.5f, -0.5f, 0.0f,
         0.0f, 0.5f, 0.0f,
     };
+    
+    // creating Vertex Array Object - VAO
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
 
     // buffer for our vertex data that will be sent to GPU
     // VBO vertex buffer object
@@ -141,7 +114,7 @@ void draw_triangle()
     // Fragment Shader - calculating colors (RGBA)
     unsigned int fragment_shader;
     fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment_shader, 1, &fragment_shader, NULL);
+    glShaderSource(fragment_shader, 1, &fragmentShaderSource, NULL);
     glCompileShader(fragment_shader);
 
     // Shader Program - creating a shader object (linking vertex and fragment)
@@ -151,17 +124,15 @@ void draw_triangle()
     glAttachShader(shader_program, vertex_shader);
     glAttachShader(shader_program, fragment_shader);
     glLinkProgram(shader_program);
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
     
     if (!success) 
     {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        glGetProgramInfoLog(shader_program, 512, NULL, infoLog);
         std::cout << "error linking shader\n" << infoLog << std::endl;
     }
 
-    // set opengl to use shader program
-    glUseProgram(shader_program);
-
+    
     // linking vertex attribute
     // 0 defined in layout = 0
     // 3 size of vertex attribute (a vec3)
@@ -172,8 +143,44 @@ void draw_triangle()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
+    while (!glfwWindowShouldClose(window))
+    {
+        // input
+        process_input(window);
+        
+        // rendering
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT); // fill the buffer with color configured by glClearColor
+        draw_triangle(shader_program);
+        
+        // displaying (swap buffers)
+        glfwSwapBuffers(window); // swap color 2d buffer (basically screen)
+        glfwPollEvents();        // check for input events
+    }
 
-    
     glDeleteShader(vertex_shader);
     glDeleteShader(fragment_shader);
+    glfwTerminate();
+    return 0;
+}
+
+// resize viewport when window is resized
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    glViewport(0, 0, width, height);
+}
+
+void process_input(GLFWwindow* window)
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+}
+
+void draw_triangle(unsigned int shader_program)
+{
+    // set opengl to use shader program
+    glUseProgram(shader_program);
+    
+    // draw triangle
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 }
